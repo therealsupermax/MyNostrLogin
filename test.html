@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nostr Login App</title>
+    
+    <!-- Add the Nostr Login script -->
+    <script src='https://www.unpkg.com/nostr-login@latest/dist/unpkg.js'></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        #loginStatus {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+    </style>
+</head>
+<body>
+    <h1>Nostr Login Demo</h1>
+    <div id="app">
+        <button onclick="handleNostrLogin()">Login with Nostr</button>
+        <div id="loginStatus"></div>
+    </div>
+
+    <script>
+        // Check if extension is available on page load
+        window.addEventListener('load', function() {
+            if (window.nostr) {
+                console.log('Nostr extension detected!');
+                document.getElementById('loginStatus').textContent = 'Nostr extension detected! Click the login button to connect.';
+            }
+        });
+
+        async function handleNostrLogin() {
+            const statusDiv = document.getElementById('loginStatus');
+            
+            try {
+                // Check if nostr is available (extension or nostr-login UI)
+                if (!window.nostr) {
+                    throw new Error('No Nostr provider found. Please install a Nostr extension.');
+                }
+
+                // Get the public key
+                const pubkey = await window.nostr.getPublicKey();
+                
+                if (!pubkey) {
+                    throw new Error('Failed to get public key');
+                }
+
+                // Success!
+                statusDiv.className = 'success';
+                statusDiv.textContent = `Successfully logged in with pubkey: ${pubkey}`;
+                console.log('Logged in with pubkey:', pubkey);
+                
+            } catch (error) {
+                console.error('Nostr login failed:', error);
+                statusDiv.className = 'error';
+                statusDiv.textContent = `Login failed: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
